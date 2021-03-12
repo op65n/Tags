@@ -1,6 +1,7 @@
 package frosty.op65n.tech.tagsspigot.storage;
 
 import frosty.op65n.tech.tagsspigot.storage.impl.TagHolder;
+import frosty.op65n.tech.tagsspigot.util.PermissionUtil;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public final class TagRegistry {
         for (final String key : TAG_REGISTRY.keySet()) {
             final TagHolder holder = TAG_REGISTRY.get(key);
 
-            if (!player.hasPermission(holder.getPermission())) {
+            if (!PermissionUtil.hasPermission(player, holder.getPermission())) {
                 continue;
             }
 
@@ -40,11 +41,11 @@ public final class TagRegistry {
         for (final String key : TAG_REGISTRY.keySet()) {
             final TagHolder holder = TAG_REGISTRY.get(key);
 
-            if (!player.hasPermission(holder.getPermission())) {
+            if (!PermissionUtil.hasPermission(player, holder.getPermission())) {
                 continue;
             }
 
-            if (player.hasPermission(String.format("tag.active.%s", key))) {
+            if (PermissionUtil.hasPermission(player, String.format("tag.active.%s", key))) {
                 result = holder;
                 break;
             }

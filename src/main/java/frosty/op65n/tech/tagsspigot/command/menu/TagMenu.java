@@ -34,6 +34,8 @@ public final class TagMenu {
 
     private PaginatedGui construct() {
         final Map<String, TagHolder> tags = this.registry.getTagsForUser(this.player);
+        final TagHolder previous = this.registry.getActiveTagForUser(player);
+
         final PaginatedGui gui = new PaginatedGui(
                 this.configuration.getInt("menu-size") / 9,
                 this.configuration.getInt("page-size"),
@@ -68,6 +70,9 @@ public final class TagMenu {
                         case "NEXT_PAGE" -> gui.next();
                         case "PREVIOUS_PAGE" -> gui.previous();
                         case "CLOSE" -> gui.close(viewer);
+                        case "UNSELECT_TAG" -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format(
+                                "lp user %s permission unset tag.active.%s", viewer.getName(), previous.getIdentifier()
+                        ));
                     }
                 });
 
@@ -103,7 +108,6 @@ public final class TagMenu {
             final GuiItem item = new GuiItem(builder.build(), event -> {
                 final Player viewer = (Player) event.getWhoClicked();
 
-                final TagHolder previous = this.registry.getActiveTagForUser(viewer);
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format(
                         "lp user %s permission unset tag.active.%s", viewer.getName(), previous.getIdentifier()
                 ));

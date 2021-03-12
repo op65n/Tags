@@ -32,11 +32,16 @@ public final class TagPlaceholder extends PlaceholderExpansion {
     @Override
     public String onPlaceholderRequest(final Player player, final String params) {
         final TagHolder holder = this.registry.getActiveTagForUser(player);
+        if (params.equalsIgnoreCase("space")) {
+            return holder != null ? " " : "";
+        }
         if (holder == null) {
             return "";
         }
-
         switch (params.toLowerCase()) {
+            case "identifier" -> {
+                return holder.getIdentifier();
+            }
             case "display" -> {
                 return holder.getDisplay();
             }
