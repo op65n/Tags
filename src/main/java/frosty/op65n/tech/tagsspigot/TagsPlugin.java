@@ -6,8 +6,11 @@ import frosty.op65n.tech.tagsspigot.listener.ConfigurationReloadListener;
 import frosty.op65n.tech.tagsspigot.placeholder.TagPlaceholder;
 import frosty.op65n.tech.tagsspigot.storage.TagRegistry;
 import frosty.op65n.tech.tagsspigot.util.FileUtil;
+import frosty.op65n.tech.tagsspigot.util.TaskUtil;
 import me.mattstudios.mf.base.CommandManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.concurrent.CompletableFuture;
 
 public final class TagsPlugin extends JavaPlugin {
 
@@ -39,10 +42,11 @@ public final class TagsPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
         super.onDisable();
-   
-        new CompletableFuture(() -> 
-          Database.INSTANCE.terminateAdapter()
-        ).join();
+
+        CompletableFuture.supplyAsync(() -> {
+            Database.INSTANCE.terminateAdapter();
+            return null;
+        }).join();
     }
 
     public TagRegistry getRegistry() {
