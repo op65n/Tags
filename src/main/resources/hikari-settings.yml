@@ -1,0 +1,10 @@
+pool: "TagsPool"
+pool-size: 4
+ip:
+port:
+jdbc: "mariadb"
+driver-class: "org.mariadb.jdbc.Driver"
+database:
+username:
+password:
+properties:

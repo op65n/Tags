@@ -2,6 +2,7 @@ package frosty.op65n.tech.tagsspigot.database.adapter;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import frosty.op65n.tech.tagsspigot.TagsPlugin;
 import frosty.op65n.tech.tagsspigot.database.tables.TableTagRegistry;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
@@ -18,14 +19,10 @@ public class ConnectionAdapter {
     private InitStatus status = InitStatus.OK;
     private String error;
 
-    private DatabaseConfiguration loadConfiguration() {
-        return new DatabaseConfiguration();
-    }
-
     private HikariDataSource createHikariDataSource(final DatabaseConfiguration configuration) {
         final Properties hikariProperties = new Properties();
 
-        // Add all properties in an map to properties
+        // Add all properties in a map to properties
         if (configuration.properties != null && !configuration.properties.isEmpty()) {
             configuration.properties.forEach(hikariProperties::setProperty);
         }
@@ -60,8 +57,8 @@ public class ConnectionAdapter {
         connection.close();
     }
 
-    public InitStatus initialize(final @NotNull ConcurrentHashMap<Integer, ConnectionHolder> connectionHolders) {
-        final DatabaseConfiguration configuration = new DatabaseConfiguration();
+    public InitStatus initialize(final @NotNull ConcurrentHashMap<Integer, ConnectionHolder> connectionHolders, final TagsPlugin plugin) {
+        final DatabaseConfiguration configuration = new DatabaseConfiguration(plugin);
 
         final HikariDataSource hikariDataSource = createHikariDataSource(configuration);
 
@@ -71,7 +68,7 @@ public class ConnectionAdapter {
                 final ConnectionHolder holder = new ConnectionHolder(hikariDataSource.getConnection(), index);
                 connectionHolders.put(index, holder);
             }
-        } catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
             status = InitStatus.ERROR;
             return status;

@@ -1,5 +1,6 @@
 package frosty.op65n.tech.tagsspigot.database;
 
+import frosty.op65n.tech.tagsspigot.TagsPlugin;
 import frosty.op65n.tech.tagsspigot.database.adapter.ConnectionAdapter;
 import frosty.op65n.tech.tagsspigot.database.adapter.ConnectionHolder;
 import org.jetbrains.annotations.NotNull;
@@ -30,9 +31,9 @@ public class Database {
         connectionHolders.replace(holder.CID, holder);
     }
 
-    public void createAdapter() {
+    public void createAdapter(final TagsPlugin plugin) {
         final ConnectionAdapter adapter = new ConnectionAdapter();
-        final ConnectionAdapter.InitStatus initStatus = adapter.initialize(connectionHolders);
+        final ConnectionAdapter.InitStatus initStatus = adapter.initialize(connectionHolders, plugin);
 
         if (initStatus == ConnectionAdapter.InitStatus.ERROR) {
             throw new RuntimeException(adapter.error());

@@ -21,7 +21,8 @@ public final class TagsPlugin extends JavaPlugin {
         Database.masterWorkerID = Thread.currentThread().getId();
 
         FileUtil.saveResources(
-                "tags-menu.yml"
+                "tags-menu.yml",
+                "hikari-settings.yml"
         );
 
         getServer().getMessenger().registerIncomingPluginChannel(
@@ -36,7 +37,7 @@ public final class TagsPlugin extends JavaPlugin {
 
         new TagPlaceholder(this.registry).register();
 
-        TaskUtil.async(() -> new Database().createAdapter());
+        TaskUtil.async(() -> new Database().createAdapter(this));
     }
 
     @Override
