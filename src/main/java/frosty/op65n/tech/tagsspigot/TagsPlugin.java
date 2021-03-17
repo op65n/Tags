@@ -1,12 +1,16 @@
 package frosty.op65n.tech.tagsspigot;
 
 import frosty.op65n.tech.tagsspigot.command.TagMenuCommand;
+import frosty.op65n.tech.tagsspigot.database.Database;
 import frosty.op65n.tech.tagsspigot.listener.ConfigurationReloadListener;
 import frosty.op65n.tech.tagsspigot.placeholder.TagPlaceholder;
 import frosty.op65n.tech.tagsspigot.storage.TagRegistry;
 import frosty.op65n.tech.tagsspigot.util.FileUtil;
+import frosty.op65n.tech.tagsspigot.util.TaskUtil;
 import me.mattstudios.mf.base.CommandManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.concurrent.CompletableFuture;
 
 public final class TagsPlugin extends JavaPlugin {
 
@@ -14,6 +18,8 @@ public final class TagsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        Database.masterWorkerID = Thread.currentThread().getId();
+
         FileUtil.saveResources(
                 "tags-menu.yml"
         );
@@ -29,6 +35,18 @@ public final class TagsPlugin extends JavaPlugin {
         );
 
         new TagPlaceholder(this.registry).register();
+
+        TaskUtil.async(() -> new Database().createAdapter());
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+
+        CompletableFuture.supplyAsync(() -> {
+            Database.INSTANCE.terminateAdapter();
+            return null;
+        }).join();
     }
 
     public TagRegistry getRegistry() {
