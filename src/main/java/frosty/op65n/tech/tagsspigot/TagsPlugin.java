@@ -1,6 +1,7 @@
 package frosty.op65n.tech.tagsspigot;
 
 import frosty.op65n.tech.tagsspigot.command.TagMenuCommand;
+import frosty.op65n.tech.tagsspigot.database.Database;
 import frosty.op65n.tech.tagsspigot.listener.ConfigurationReloadListener;
 import frosty.op65n.tech.tagsspigot.placeholder.TagPlaceholder;
 import frosty.op65n.tech.tagsspigot.storage.TagRegistry;
@@ -14,6 +15,8 @@ public final class TagsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        Database.masterWorkerID = Thread.currentThread().getId();
+
         FileUtil.saveResources(
                 "tags-menu.yml"
         );
@@ -29,6 +32,16 @@ public final class TagsPlugin extends JavaPlugin {
         );
 
         new TagPlaceholder(this.registry).register();
+
+        // TODO: (Frosty) This needs to be async, main thread can go on no need to wait for this
+        new Database().createAdapter();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+        // TODO: (Frosty) This needs to be async, but the main thread needs to wait for this to finish.
+        Database.INSTANCE.terminateAdapter();
     }
 
     public TagRegistry getRegistry() {
