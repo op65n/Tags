@@ -24,7 +24,7 @@ public class TableTagRegistry implements ITable {
     public @NotNull String getCreateQuery() {
         return "CREATE TABLE IF NOT EXISTS `" + database + "`.`tag_registry` ( " +
                 "  `player` VARCHAR(36) NOT NULL, " +
-                "  `tag` VARCHAR(16) NOT NULL, " +
+                "  `tag` VARCHAR(16) NULL, " +
                 "  PRIMARY KEY (`player`), " +
                 "  UNIQUE INDEX `player_UNIQUE` (`player` ASC)) " +
                 "ENGINE = InnoDB;";

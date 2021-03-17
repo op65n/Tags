@@ -59,7 +59,6 @@ public class ConnectionAdapter {
 
     public InitStatus initialize(final @NotNull ConcurrentHashMap<Integer, ConnectionHolder> connectionHolders, final TagsPlugin plugin) {
         final DatabaseConfiguration configuration = new DatabaseConfiguration(plugin);
-
         final HikariDataSource hikariDataSource = createHikariDataSource(configuration);
 
         try {

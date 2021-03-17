@@ -1,10 +1,21 @@
 pool: "TagsPool"
 pool-size: 4
-ip:
-port:
+ip: "127.0.0.1"
+port: "3306"
 jdbc: "mariadb"
 driver-class: "org.mariadb.jdbc.Driver"
-database:
-username:
-password:
+database: "generic_database"
+username: ":/"
+password: ":/"
 properties:
+  "dataSource.cachePrepStmts": true
+  "dataSource.prepStmtCacheSize": 250
+  "dataSource.prepStmtCacheSqlLimit": 2048
+  "dataSource.useServerPrepStmts": true
+  "dataSource.useLocalSessionState": true
+  "dataSource.rewriteBatchedStatements": true
+  "dataSource.cacheResultSetMetadata": true
+  "dataSource.cacheServerConfiguration": true
+  "dataSource.elideSetAutoCommits": true
+  "dataSource.maintainTimeStats": false
+  "dataSource.connectionTimeout": 6000

@@ -1,10 +1,14 @@
 package frosty.op65n.tech.tagsspigot.command.menu;
 
+import frosty.op65n.tech.tagsspigot.database.api.ConcurrentConnection;
+import frosty.op65n.tech.tagsspigot.database.api.DataSource;
+import frosty.op65n.tech.tagsspigot.placeholder.TagPlaceholder;
 import frosty.op65n.tech.tagsspigot.storage.TagRegistry;
 import frosty.op65n.tech.tagsspigot.storage.impl.TagHolder;
 import frosty.op65n.tech.tagsspigot.util.FileUtil;
 import frosty.op65n.tech.tagsspigot.util.HexUtil;
 import frosty.op65n.tech.tagsspigot.util.ReplaceUtil;
+import frosty.op65n.tech.tagsspigot.util.TaskUtil;
 import me.mattstudios.mfgui.gui.components.ItemBuilder;
 import me.mattstudios.mfgui.gui.guis.GuiItem;
 import me.mattstudios.mfgui.gui.guis.PaginatedGui;
@@ -14,6 +18,8 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Map;
 
 @SuppressWarnings("ConstantConditions")
@@ -108,12 +114,29 @@ public final class TagMenu {
             final GuiItem item = new GuiItem(builder.build(), event -> {
                 final Player viewer = (Player) event.getWhoClicked();
 
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format(
-                        "lp user %s permission unset tag.active.%s", viewer.getName(), previous.getIdentifier()
-                ));
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format(
-                        "lp user %s permission set tag.active.%s", viewer.getName(), holder.getIdentifier()
-                ));
+                // TODO: (frosty) Should the player in sql statements be replaced with viewer?
+                TaskUtil.async(() -> {
+                    try {
+                        final DataSource dataSource = new ConcurrentConnection().borrow();
+
+                        final PreparedStatement updateQuery = dataSource.prepare(
+                                "REPLACE INTO tag_registry (player, tag) VALUES (?, ?);"
+                        );
+                        updateQuery.setString(1, player.getName());
+                        updateQuery.setString(2, holder.getDisplay());
+                        updateQuery.executeQuery();
+                        // We don't need to keep this query cached, yeet
+                        updateQuery.close();
+
+                        dataSource.free();
+
+                        TagPlaceholder.cachePlayerTag(player);
+                    } catch (SQLException ex) {
+                        // TODO: (frosty) Handle errors here, idk tell a player something went wrong
+                        ex.printStackTrace();
+                    }
+                });
+
             });
 
             gui.addItem(item);

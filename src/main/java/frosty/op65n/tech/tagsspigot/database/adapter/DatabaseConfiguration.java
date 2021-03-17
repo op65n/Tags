@@ -25,8 +25,8 @@ public class DatabaseConfiguration {
         this.username = configuration.getString("username");
         this.passwd = configuration.getString("password");
 
-        for (final String key : configuration.getConfigurationSection("settings").getKeys(false)) {
-            this.properties.put(key, configuration.getString("settings." + key));
+        for (final String key : configuration.getConfigurationSection("properties").getKeys(false)) {
+            this.properties.put(key, configuration.getString("properties." + key));
         }
     }
 
