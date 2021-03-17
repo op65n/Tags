@@ -33,15 +33,16 @@ public final class TagsPlugin extends JavaPlugin {
 
         new TagPlaceholder(this.registry).register();
 
-        // TODO: (Frosty) This needs to be async, main thread can go on no need to wait for this
-        new Database().createAdapter();
+        TaskUtil.async(() -> new Database().createAdapter());
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
-        // TODO: (Frosty) This needs to be async, but the main thread needs to wait for this to finish.
-        Database.INSTANCE.terminateAdapter();
+   
+        new CompletableFuture(() -> 
+          Database.INSTANCE.terminateAdapter()
+        ).join();
     }
 
     public TagRegistry getRegistry() {
