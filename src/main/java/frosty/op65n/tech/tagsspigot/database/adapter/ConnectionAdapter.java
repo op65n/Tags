@@ -23,9 +23,10 @@ public class ConnectionAdapter {
         final Properties hikariProperties = new Properties();
 
         // Add all properties in a map to properties
-        if (configuration.properties != null && !configuration.properties.isEmpty()) {
+        if (!configuration.properties.isEmpty()) {
             configuration.properties.forEach(hikariProperties::setProperty);
         }
+
         // Apply the properties to HikariConfig
         HikariConfig hikariConfig = new HikariConfig(hikariProperties);
         // Set some common properties manually from the config

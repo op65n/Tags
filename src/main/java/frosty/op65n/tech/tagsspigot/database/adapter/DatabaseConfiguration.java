@@ -2,31 +2,41 @@ package frosty.op65n.tech.tagsspigot.database.adapter;
 
 import frosty.op65n.tech.tagsspigot.TagsPlugin;
 import frosty.op65n.tech.tagsspigot.util.FileUtil;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.intellij.lang.annotations.Language;
+import org.jetbrains.annotations.NotNull;
 
+import javax.sound.midi.MidiFileFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 public final class DatabaseConfiguration {
 
     public DatabaseConfiguration(final TagsPlugin plugin) {
         final FileConfiguration configuration = FileUtil.getConfiguration("hikari-settings.yml");
 
-        this.pool = configuration.getString("pool");
-        this.poolSize = Integer.parseInt(configuration.getString("pool-size"));
+        this.pool = configuration.getString("pool", "TagsPool");
+        this.poolSize = configuration.getInt("pool_size", 2);
         this.ip = configuration.getString("ip");
         this.port = configuration.getString("port");
         this.jdbc = configuration.getString("jdbc");
-        this.driverClassName = configuration.getString("driver-class");
+        this.driverClassName = configuration.getString("driver_class");
         this.database = configuration.getString("database");
         this.username = configuration.getString("username");
         this.passwd = configuration.getString("password");
 
-        //sudoku first
-        for (final String key : configuration.getConfigurationSection("properties").getKeys(false)) {
-            properties.put(key, String.valueOf(configuration.get("properties." + key)));
-        }
+        final ConfigurationSection propertiesSection = configuration.getConfigurationSection("properties");
+
+        if (propertiesSection == null) return;
+
+        final Set<String> keys = propertiesSection.getKeys(false);
+        keys.forEach(key -> {
+            final String value = propertiesSection.getString(key);
+            properties.put("dataSource." + key, value);
+        });
     }
 
     public final String pool;
