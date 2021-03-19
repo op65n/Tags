@@ -19,6 +19,10 @@ public final class TagRegistry {
         return TAG_REGISTRY;
     }
 
+    public TagHolder getTagWithIdentifier(final String identifier) {
+        return TAG_REGISTRY.get(identifier);
+    }
+
     public Map<String, TagHolder> getTagsForUser(final Player player) {
         final Map<String, TagHolder> result = new HashMap<>();
 
@@ -30,25 +34,6 @@ public final class TagRegistry {
             }
 
             result.put(key, holder);
-        }
-
-        return result;
-    }
-
-    public TagHolder getActiveTagForUser(final Player player) {
-        TagHolder result = null;
-
-        for (final String key : TAG_REGISTRY.keySet()) {
-            final TagHolder holder = TAG_REGISTRY.get(key);
-
-            if (!PermissionUtil.hasPermission(player, holder.getPermission())) {
-                continue;
-            }
-
-            if (PermissionUtil.hasPermission(player, String.format("tag.active.%s", key))) {
-                result = holder;
-                break;
-            }
         }
 
         return result;

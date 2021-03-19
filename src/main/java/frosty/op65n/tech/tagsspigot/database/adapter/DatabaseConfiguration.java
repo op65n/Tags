@@ -1,22 +1,20 @@
 package frosty.op65n.tech.tagsspigot.database.adapter;
 
 import frosty.op65n.tech.tagsspigot.TagsPlugin;
+import frosty.op65n.tech.tagsspigot.util.FileUtil;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.intellij.lang.annotations.Language;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DatabaseConfiguration {
+public final class DatabaseConfiguration {
 
     public DatabaseConfiguration(final TagsPlugin plugin) {
-        final File file = new File(plugin.getDataFolder(), "hikari-settings.yml");
-        final FileConfiguration configuration = YamlConfiguration.loadConfiguration(file);
+        final FileConfiguration configuration = FileUtil.getConfiguration("hikari-settings.yml");
 
         this.pool = configuration.getString("pool");
-        this.poolSize = configuration.getInt("pool-size");
+        this.poolSize = Integer.parseInt(configuration.getString("pool-size"));
         this.ip = configuration.getString("ip");
         this.port = configuration.getString("port");
         this.jdbc = configuration.getString("jdbc");
@@ -25,31 +23,32 @@ public class DatabaseConfiguration {
         this.username = configuration.getString("username");
         this.passwd = configuration.getString("password");
 
+        //sudoku first
         for (final String key : configuration.getConfigurationSection("properties").getKeys(false)) {
-            this.properties.put(key, configuration.getString("properties." + key));
+            properties.put(key, String.valueOf(configuration.get("properties." + key)));
         }
     }
 
-    public String pool = "TagsPool";
+    public final String pool;
 
-    public Integer poolSize = 4;
+    public final Integer poolSize;
 
-    public String ip;
+    public final String ip;
 
-    public String port;
+    public final String port;
 
-    public String jdbc = "mariadb";
+    public final String jdbc;
 
-    public String driverClassName = "org.mariadb.jdbc.Driver";
+    public final String driverClassName;
 
     @Language("MariaDB")
-    public String database;
+    public final String database;
 
-    public String username;
+    public final String username;
 
-    public String passwd;
+    public final String passwd;
 
-    public Map<String, String> properties = new HashMap<>();
+    public final Map<String, String> properties = new HashMap<>();
 
 }
 

@@ -6,7 +6,10 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Properties;
 
 public final class FileUtil {
 
@@ -24,6 +27,30 @@ public final class FileUtil {
                 PLUGIN.saveResource(path, false);
             }
         });
+    }
+
+    public static Properties readPropertiesFile(final String fileName) {
+        FileInputStream inputStream = null;
+        final Properties properties = new Properties();
+
+        try {
+            try {
+                inputStream = new FileInputStream(fileName);
+                properties.load(inputStream);
+            } catch (final IOException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+            } catch (final IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+
+        return properties;
     }
 
 }

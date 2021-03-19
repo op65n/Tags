@@ -12,7 +12,6 @@ import frosty.op65n.tech.tagsspigot.util.TaskUtil;
 import me.mattstudios.mfgui.gui.components.ItemBuilder;
 import me.mattstudios.mfgui.gui.guis.GuiItem;
 import me.mattstudios.mfgui.gui.guis.PaginatedGui;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -40,7 +39,6 @@ public final class TagMenu {
 
     private PaginatedGui construct() {
         final Map<String, TagHolder> tags = this.registry.getTagsForUser(this.player);
-        final TagHolder previous = this.registry.getActiveTagForUser(player);
 
         final PaginatedGui gui = new PaginatedGui(
                 this.configuration.getInt("menu-size") / 9,
@@ -76,9 +74,25 @@ public final class TagMenu {
                         case "NEXT_PAGE" -> gui.next();
                         case "PREVIOUS_PAGE" -> gui.previous();
                         case "CLOSE" -> gui.close(viewer);
-                        case "UNSELECT_TAG" -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), String.format(
-                                "lp user %s permission unset tag.active.%s", viewer.getName(), previous.getIdentifier()
-                        ));
+                        case "UNSELECT_TAG" -> {
+                            TaskUtil.async(() -> {
+                                try {
+                                    final DataSource dataSource = new ConcurrentConnection().borrow();
+                                    final PreparedStatement updateQuery = dataSource.prepare(
+                                            "REPLACE INTO tag_registry (player, tag) VALUES (?, ?);"
+                                    );
+                                    updateQuery.setString(1, player.getName());
+                                    updateQuery.setString(2, "");
+                                    updateQuery.executeQuery();
+                                    // We don't need to keep this query cached, yeet
+                                    updateQuery.close();
+                                    dataSource.free();
+                                    TagPlaceholder.cachePlayerTag(player);
+                                } catch (SQLException ex) {
+                                    ex.printStackTrace();
+                                }
+                            });
+                        }
                     }
                 });
 
@@ -112,13 +126,9 @@ public final class TagMenu {
             )));
 
             final GuiItem item = new GuiItem(builder.build(), event -> {
-                final Player viewer = (Player) event.getWhoClicked();
-
-                // TODO: (frosty) Should the player in sql statements be replaced with viewer?
                 TaskUtil.async(() -> {
                     try {
                         final DataSource dataSource = new ConcurrentConnection().borrow();
-
                         final PreparedStatement updateQuery = dataSource.prepare(
                                 "REPLACE INTO tag_registry (player, tag) VALUES (?, ?);"
                         );
@@ -132,7 +142,6 @@ public final class TagMenu {
 
                         TagPlaceholder.cachePlayerTag(player);
                     } catch (SQLException ex) {
-                        // TODO: (frosty) Handle errors here, idk tell a player something went wrong
                         ex.printStackTrace();
                     }
                 });

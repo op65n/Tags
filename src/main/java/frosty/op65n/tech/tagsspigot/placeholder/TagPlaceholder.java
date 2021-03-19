@@ -15,12 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class TagPlaceholder extends PlaceholderExpansion {
 
-    private static final ConcurrentHashMap<String, String> playerTagCache = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, String> PLAYER_TAG_CACHE = new ConcurrentHashMap<>();
 
-    /**
-     * This is static because I don't know if I can create new instance for this class
-     * TODO: (frosty) if this can be non-static I can easily change this
-     */
     public static void cachePlayerTag(final Player player) throws SQLException {
         final DataSource dataSource = new ConcurrentConnection().borrow();
 
@@ -31,16 +27,15 @@ public final class TagPlaceholder extends PlaceholderExpansion {
         if (!tagFetchResult.next()) return;
         final String fetchedTag = tagFetchResult.getString("tag");
 
-        playerTagCache.put(player.getName(), fetchedTag);
+        PLAYER_TAG_CACHE.put(player.getName(), fetchedTag);
 
         dataSource.free();
     }
 
     private final TagRegistry registry;
 
-    private String retrieveCachedDisplay(final Player player) {
-        // TODO: (frosty) modify default value if this is not right, player name is cached because it's less expensive
-        return playerTagCache.getOrDefault(player.getName(), "");
+    public static String retrieveCachedDisplay(final Player player) {
+        return PLAYER_TAG_CACHE.getOrDefault(player.getName(), null);
     }
 
     public TagPlaceholder(final TagRegistry registry) {
@@ -64,7 +59,7 @@ public final class TagPlaceholder extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(final Player player, final String params) {
-        final TagHolder holder = this.registry.getActiveTagForUser(player);
+        final TagHolder holder = this.registry.getTagWithIdentifier(retrieveCachedDisplay(player));
         if (params.equalsIgnoreCase("space")) {
             return holder != null ? " " : "";
         }
@@ -76,12 +71,10 @@ public final class TagPlaceholder extends PlaceholderExpansion {
                 return holder.getIdentifier();
             }
             case "display" -> {
-                return retrieveCachedDisplay(player);
+                return holder.getDisplay();
             }
             case "display-colored" -> {
-                // TODO: (frosty) If this needs to be fetched from holder change it back
-                // return HexUtil.colorify(holder.getDisplay());
-                return HexUtil.colorify(retrieveCachedDisplay(player));
+                return HexUtil.colorify(holder.getDisplay());
             }
             case "description" -> {
                 return holder.getDescription();
