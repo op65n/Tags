@@ -31,5 +31,6 @@ tag-item:
   material: NAME_TAG
   display: "{tag_display} Tag"
   lore:
-    - "Some lore idk, {tag_description}"
-    - "identifier: {tag_identifier}"
+    - "&7&o{tag_description}"
+    - ""
+    - " &7&oClick to select this tag."

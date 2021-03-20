@@ -2,7 +2,6 @@ package frosty.op65n.tech.tagsspigot.database.adapter;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import frosty.op65n.tech.tagsspigot.TagsPlugin;
 import frosty.op65n.tech.tagsspigot.database.tables.TableTagRegistry;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
@@ -14,10 +13,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ConnectionAdapter {
+public final class ConnectionAdapter {
 
     private InitStatus status = InitStatus.OK;
-    private String error;
+    private final String error = "";
 
     private HikariDataSource createHikariDataSource(final DatabaseConfiguration configuration) {
         final Properties hikariProperties = new Properties();
@@ -58,8 +57,8 @@ public class ConnectionAdapter {
         connection.close();
     }
 
-    public InitStatus initialize(final @NotNull ConcurrentHashMap<Integer, ConnectionHolder> connectionHolders, final TagsPlugin plugin) {
-        final DatabaseConfiguration configuration = new DatabaseConfiguration(plugin);
+    public InitStatus initialize(final @NotNull ConcurrentHashMap<Integer, ConnectionHolder> connectionHolders) {
+        final DatabaseConfiguration configuration = new DatabaseConfiguration();
         final HikariDataSource hikariDataSource = createHikariDataSource(configuration);
 
         try {

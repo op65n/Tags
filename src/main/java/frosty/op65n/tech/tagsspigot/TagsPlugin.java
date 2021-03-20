@@ -3,7 +3,7 @@ package frosty.op65n.tech.tagsspigot;
 import frosty.op65n.tech.tagsspigot.command.TagMenuCommand;
 import frosty.op65n.tech.tagsspigot.database.Database;
 import frosty.op65n.tech.tagsspigot.listener.ConfigurationReloadListener;
-import frosty.op65n.tech.tagsspigot.listener.OnJoinListener;
+import frosty.op65n.tech.tagsspigot.listener.JoinListener;
 import frosty.op65n.tech.tagsspigot.placeholder.TagPlaceholder;
 import frosty.op65n.tech.tagsspigot.storage.TagRegistry;
 import frosty.op65n.tech.tagsspigot.util.FileUtil;
@@ -30,7 +30,7 @@ public final class TagsPlugin extends JavaPlugin {
                 this, "BungeeCord",
                 new ConfigurationReloadListener(this.registry)
         );
-        getServer().getPluginManager().registerEvents(new OnJoinListener(), this);
+        getServer().getPluginManager().registerEvents(new JoinListener(this), this);
 
         final CommandManager manager = new CommandManager(this);
         manager.register(
@@ -39,7 +39,7 @@ public final class TagsPlugin extends JavaPlugin {
 
         new TagPlaceholder(this.registry).register();
 
-        TaskUtil.async(() -> new Database().createAdapter(this));
+        TaskUtil.async(() -> new Database().createAdapter());
     }
 
     @Override

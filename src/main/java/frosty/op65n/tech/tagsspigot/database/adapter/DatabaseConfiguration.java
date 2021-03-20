@@ -1,21 +1,17 @@
 package frosty.op65n.tech.tagsspigot.database.adapter;
 
-import frosty.op65n.tech.tagsspigot.TagsPlugin;
 import frosty.op65n.tech.tagsspigot.util.FileUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.intellij.lang.annotations.Language;
-import org.jetbrains.annotations.NotNull;
 
-import javax.sound.midi.MidiFileFormat;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 public final class DatabaseConfiguration {
 
-    public DatabaseConfiguration(final TagsPlugin plugin) {
+    public DatabaseConfiguration() {
         final FileConfiguration configuration = FileUtil.getConfiguration("hikari-settings.yml");
 
         this.pool = configuration.getString("pool", "TagsPool");

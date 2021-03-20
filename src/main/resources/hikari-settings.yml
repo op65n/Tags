@@ -4,7 +4,7 @@ ip: "127.0.0.1"
 port: "3306"
 jdbc: "mariadb"
 driver_class: "org.mariadb.jdbc.Driver"
-database: "generic_database"
+database: "tags_database"
 username: ":/"
 password: ":/"
 properties:

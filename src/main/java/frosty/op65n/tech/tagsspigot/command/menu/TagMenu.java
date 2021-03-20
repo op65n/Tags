@@ -133,7 +133,7 @@ public final class TagMenu {
                                 "REPLACE INTO tag_registry (player, tag) VALUES (?, ?);"
                         );
                         updateQuery.setString(1, player.getName());
-                        updateQuery.setString(2, holder.getDisplay());
+                        updateQuery.setString(2, holder.getIdentifier());
                         updateQuery.executeQuery();
                         // We don't need to keep this query cached, yeet
                         updateQuery.close();
@@ -145,7 +145,7 @@ public final class TagMenu {
                         ex.printStackTrace();
                     }
                 });
-
+                gui.close(player);
             });
 
             gui.addItem(item);
