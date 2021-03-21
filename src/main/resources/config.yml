@@ -1,0 +1,11 @@
+main-file-registry: true
+
+tags:
+  snowman:
+    description: "A special tag granted to only the snowflakes"
+    display: "&8[&fSnowman&8]"
+    permission: tag.snowman
+  test:
+    description: "/"
+    display: "TeSt"
+    permission: tag.test

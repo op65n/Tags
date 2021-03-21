@@ -1,13 +1,12 @@
 package frosty.op65n.tech.tagsspigot;
 
+import frosty.op65n.tech.tagsspigot.command.ReloadCommand;
 import frosty.op65n.tech.tagsspigot.command.TagMenuCommand;
 import frosty.op65n.tech.tagsspigot.database.Database;
-import frosty.op65n.tech.tagsspigot.listener.ConfigurationReloadListener;
 import frosty.op65n.tech.tagsspigot.listener.JoinListener;
 import frosty.op65n.tech.tagsspigot.placeholder.TagPlaceholder;
 import frosty.op65n.tech.tagsspigot.storage.TagRegistry;
 import frosty.op65n.tech.tagsspigot.util.FileUtil;
-import frosty.op65n.tech.tagsspigot.util.TaskUtil;
 import me.mattstudios.mf.base.CommandManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -22,29 +21,27 @@ public final class TagsPlugin extends JavaPlugin {
         Database.masterWorkerID = Thread.currentThread().getId();
 
         FileUtil.saveResources(
+                "config.yml",
                 "tags-menu.yml",
                 "hikari-settings.yml"
         );
 
-        getServer().getMessenger().registerIncomingPluginChannel(
-                this, "tags:request",
-                new ConfigurationReloadListener(this.registry)
-        );
-        getServer().getMessenger().registerOutgoingPluginChannel(
-                this, "tags:request"
-        );
         getServer().getPluginManager().registerEvents(new JoinListener(), this);
 
         final CommandManager manager = new CommandManager(this);
         manager.register(
-                new TagMenuCommand(this)
+                new TagMenuCommand(this),
+                new ReloadCommand(this)
         );
 
         new TagPlaceholder(this.registry).register();
 
-        TaskUtil.async(() ->
-                new Database().createAdapter()
-        );
+        CompletableFuture.supplyAsync(() -> {
+            new Database().createAdapter();
+
+            registry.load(this);
+            return null;
+        }).thenRun(registry::request);
     }
 
     @Override

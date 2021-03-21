@@ -2,6 +2,7 @@ package frosty.op65n.tech.tagsspigot.database.adapter;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import frosty.op65n.tech.tagsspigot.database.tables.TableConfigRegistry;
 import frosty.op65n.tech.tagsspigot.database.tables.TableTagRegistry;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +44,8 @@ public final class ConnectionAdapter {
     private void createTables(@Language("MariaDB") String database, final HikariDataSource hikariDataSource) throws SQLException {
         // List of all database table
         final List<ITable> tables = ITable.sort(
-                new TableTagRegistry(database)
+                new TableTagRegistry(database),
+                new TableConfigRegistry(database)
         );
 
         final Connection connection = hikariDataSource.getConnection();
