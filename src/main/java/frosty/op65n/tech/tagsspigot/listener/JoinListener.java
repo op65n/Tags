@@ -1,8 +1,5 @@
 package frosty.op65n.tech.tagsspigot.listener;
 
-import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.io.ByteStreams;
-import frosty.op65n.tech.tagsspigot.TagsPlugin;
 import frosty.op65n.tech.tagsspigot.placeholder.TagPlaceholder;
 import frosty.op65n.tech.tagsspigot.util.TaskUtil;
 import org.bukkit.entity.Player;
@@ -12,14 +9,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.sql.SQLException;
 
-@SuppressWarnings("UnstableApiUsage")
 public class JoinListener implements Listener {
 
-    private final TagsPlugin plugin;
-
-    public JoinListener(final TagsPlugin plugin) {
-        this.plugin = plugin;
-    }
+    private boolean requested = false;
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
@@ -31,24 +23,12 @@ public class JoinListener implements Listener {
             }
         });
 
-        if (plugin.getServer().getOnlinePlayers().size() < 2) {
+        if (!requested) {
             final Player player = event.getPlayer();
 
-            plugin.getServer().getMessenger().dispatchIncomingMessage(
-                    player,
-                    "BungeeCord",
-                    request()
-            );
+            System.out.println(player.getServer().getMessenger().getOutgoingChannels());
+            requested = true;
         }
-    }
-
-    private byte[] request() {
-        final ByteArrayDataOutput data = ByteStreams.newDataOutput();
-
-        data.writeUTF("tag-request");
-        data.writeUTF("send data");
-
-        return data.toByteArray();
     }
 
 }

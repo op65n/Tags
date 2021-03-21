@@ -18,20 +18,20 @@ public final class ConfigurationReloadListener implements PluginMessageListener 
 
     @Override
     public void onPluginMessageReceived(final String channel, final Player player, final byte[] message) {
-        if (!channel.equalsIgnoreCase("BungeeCord")) {
+        if (!channel.equalsIgnoreCase("tags:request")) {
             return;
         }
 
         final ByteArrayDataInput input = ByteStreams.newDataInput(message);
-        final String subChannel = input.readUTF();
 
-        if (!subChannel.equalsIgnoreCase("tag-recipient")) {
+        final String type = input.readUTF();
+        if (!type.equalsIgnoreCase("data-package")) {
             return;
         }
 
         final String identifier = input.readUTF();
         final TagHolder holder = new TagHolder(
-            identifier, input.readUTF(), input.readUTF(), input.readUTF()
+                identifier, input.readUTF(), input.readUTF(), input.readUTF()
         );
 
         this.registry.updateRegistry(identifier, holder);

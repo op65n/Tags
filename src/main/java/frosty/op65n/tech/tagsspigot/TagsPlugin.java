@@ -27,10 +27,13 @@ public final class TagsPlugin extends JavaPlugin {
         );
 
         getServer().getMessenger().registerIncomingPluginChannel(
-                this, "BungeeCord",
+                this, "tags:request",
                 new ConfigurationReloadListener(this.registry)
         );
-        getServer().getPluginManager().registerEvents(new JoinListener(this), this);
+        getServer().getMessenger().registerOutgoingPluginChannel(
+                this, "tags:request"
+        );
+        getServer().getPluginManager().registerEvents(new JoinListener(), this);
 
         final CommandManager manager = new CommandManager(this);
         manager.register(
@@ -39,7 +42,9 @@ public final class TagsPlugin extends JavaPlugin {
 
         new TagPlaceholder(this.registry).register();
 
-        TaskUtil.async(() -> new Database().createAdapter());
+        TaskUtil.async(() ->
+                new Database().createAdapter()
+        );
     }
 
     @Override

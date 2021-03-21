@@ -88,6 +88,7 @@ public final class TagMenu {
                                     updateQuery.close();
                                     dataSource.free();
                                     TagPlaceholder.cachePlayerTag(player);
+                                    gui.close(player);
                                 } catch (SQLException ex) {
                                     ex.printStackTrace();
                                 }
