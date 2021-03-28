@@ -6,6 +6,7 @@ import me.mattstudios.mf.annotations.Command;
 import me.mattstudios.mf.annotations.Permission;
 import me.mattstudios.mf.annotations.SubCommand;
 import me.mattstudios.mf.base.CommandBase;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 @Command("tags")
@@ -19,9 +20,21 @@ public final class ReloadCommand extends CommandBase {
 
     @SubCommand("reload")
     @Permission("tags.command.reload")
-    public void onReload(final Player player) {
+    public void onReload(final CommandSender sender) {
         TaskUtil.async(() -> {
             plugin.getRegistry().request();
+
+            sender.sendMessage("Gawk Gawk Requested updated config from Database.");
+        });
+    }
+
+    @SubCommand("load")
+    @Permission("tags.command.load")
+    public void onLoad(final CommandSender sender) {
+        TaskUtil.async(() -> {
+            plugin.getRegistry().load(plugin);
+
+            sender.sendMessage("Gawk Gawk Loaded Config into Database.");
         });
     }
 
