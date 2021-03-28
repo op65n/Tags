@@ -84,8 +84,7 @@ public final class TagMenu {
                                     updateQuery.setString(1, player.getName());
                                     updateQuery.setString(2, "");
                                     updateQuery.executeQuery();
-                                    // We don't need to keep this query cached, yeet
-                                    updateQuery.close();
+
                                     dataSource.free();
                                     TagPlaceholder.cachePlayerTag(player);
                                     gui.close(player);
@@ -136,8 +135,6 @@ public final class TagMenu {
                         updateQuery.setString(1, player.getName());
                         updateQuery.setString(2, holder.getIdentifier());
                         updateQuery.executeQuery();
-                        // We don't need to keep this query cached, yeet
-                        updateQuery.close();
 
                         dataSource.free();
 
