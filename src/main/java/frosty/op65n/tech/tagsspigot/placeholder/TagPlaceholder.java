@@ -63,9 +63,11 @@ public final class TagPlaceholder extends PlaceholderExpansion {
         if (params.equalsIgnoreCase("space")) {
             return holder != null ? " " : "";
         }
+
         if (holder == null) {
             return "";
         }
+
         switch (params.toLowerCase()) {
             case "identifier" -> {
                 return holder.getIdentifier();

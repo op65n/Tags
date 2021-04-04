@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "frosty.op65n.tech.tagsspigot"
-version = "0.0.5-Alpha"
+version = "0.0.7-PreRelease"
 
 repositories {
 	mavenCentral()
@@ -28,6 +28,7 @@ dependencies {
 
 shadowJar {
 	relocate "me.mattstudios.mf", "${project.group}.library.mf"
+	relocate "com.zaxxer.hikari", "${project.group}.library.hikari"
 
 	archiveFileName.set("TagsSpigot.jar")
 }

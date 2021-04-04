@@ -7,11 +7,14 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.SplittableRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class HexUtil {
+
+    private static final SplittableRandom RANDOM = new SplittableRandom();
 
     private static final int CHARS_UNTIL_LOOP = 30;
     private static final Pattern RAINBOW_PATTERN = Pattern.compile("<(?<type>rainbow|r)(#(?<speed>\\d+))?(:(?<saturation>\\d*\\.?\\d+))?(:(?<brightness>\\d*\\.?\\d+))?(:(?<loop>l|L|loop))?>");
@@ -33,6 +36,45 @@ public final class HexUtil {
                     "#([A-Fa-f0-9]){6}|" +
                     org.bukkit.ChatColor.COLOR_CHAR
     );
+
+    private static final Pattern BUKKIT_COLOR = Pattern.compile("(&[a-f0-9r])|");
+
+    public static String replaceWithRandom(String input) {
+        for (final Pattern pattern : HEX_PATTERNS) {
+            Matcher matcher = pattern.matcher(input);
+
+            while (matcher.find()) {
+                final String before = input.substring(0, matcher.start());
+                final String after = input.substring(matcher.end());
+
+                input = before + getRandomHex() + after;
+                matcher = pattern.matcher(input);
+            }
+        }
+
+        String result = "";
+        for (int index = 0; index < input.length(); index++) {
+            try {
+                final char c = input.charAt(index);
+                final char previous = index - 1 == -1 ? '/' : input.charAt(index - 1);
+
+                if (c != '&' && previous != '&') {
+                    result = result.concat(String.valueOf(c));
+                } else {
+                    result = result.concat(getRandomHex());
+                }
+            } catch (IndexOutOfBoundsException ignored) {
+            }
+        }
+
+        return result;
+    }
+
+    public static String getRandomHex() {
+        final Color color = new Color(RANDOM.nextInt(255), RANDOM.nextInt(255), RANDOM.nextInt(255));
+
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+    }
 
     /**
      * Gets a capture group from a regex Matcher if it exists

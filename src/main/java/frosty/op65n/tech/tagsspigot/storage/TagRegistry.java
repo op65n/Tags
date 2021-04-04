@@ -24,6 +24,8 @@ public final class TagRegistry {
         return TAG_REGISTRY;
     }
 
+    public static Map<String, TagHolder> getTemporaryTagRegistry() { return TAG_REGISTRY; }
+
     public TagHolder getTagWithIdentifier(final String identifier) {
         return TAG_REGISTRY.get(identifier);
     }
