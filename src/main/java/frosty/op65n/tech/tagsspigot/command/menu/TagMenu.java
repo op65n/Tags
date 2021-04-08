@@ -1,7 +1,5 @@
 package frosty.op65n.tech.tagsspigot.command.menu;
 
-import frosty.op65n.tech.tagsspigot.database.api.ConcurrentConnection;
-import frosty.op65n.tech.tagsspigot.database.api.DataSource;
 import frosty.op65n.tech.tagsspigot.placeholder.TagPlaceholder;
 import frosty.op65n.tech.tagsspigot.storage.TagRegistry;
 import frosty.op65n.tech.tagsspigot.storage.impl.TagHolder;
@@ -16,6 +14,8 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.op65n.gazelle.api.ConcurrentConnection;
+import org.op65n.gazelle.api.DataSource;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -81,6 +81,7 @@ public final class TagMenu {
                                     final PreparedStatement updateQuery = dataSource.prepare(
                                             "REPLACE INTO tag_registry (player, tag) VALUES (?, ?);"
                                     );
+
                                     updateQuery.setString(1, player.getName());
                                     updateQuery.setString(2, "");
                                     updateQuery.executeQuery();

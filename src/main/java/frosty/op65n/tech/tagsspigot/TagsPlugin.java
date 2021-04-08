@@ -2,14 +2,19 @@ package frosty.op65n.tech.tagsspigot;
 
 import frosty.op65n.tech.tagsspigot.command.ReloadCommand;
 import frosty.op65n.tech.tagsspigot.command.TagMenuCommand;
-import frosty.op65n.tech.tagsspigot.database.Database;
+import frosty.op65n.tech.tagsspigot.database.tables.TableConfigRegistry;
+import frosty.op65n.tech.tagsspigot.database.tables.TableTagRegistry;
 import frosty.op65n.tech.tagsspigot.listener.JoinListener;
 import frosty.op65n.tech.tagsspigot.placeholder.TagPlaceholder;
 import frosty.op65n.tech.tagsspigot.storage.TagRegistry;
 import frosty.op65n.tech.tagsspigot.util.FileUtil;
 import me.mattstudios.mf.base.CommandManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.op65n.gazelle.Gazelle;
+import org.op65n.gazelle.adapter.TomlGazelleConfiguration;
+import org.op65n.gazelle.api.GazelleConfiguration;
 
+import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;
 
 public final class TagsPlugin extends JavaPlugin {
@@ -18,12 +23,10 @@ public final class TagsPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        Database.masterWorkerID = Thread.currentThread().getId();
-
         FileUtil.saveResources(
                 "config.yml",
                 "tags-menu.yml",
-                "hikari-settings.yml"
+                "hikari-settings.toml"
         );
 
         getServer().getPluginManager().registerEvents(new JoinListener(), this);
@@ -37,7 +40,18 @@ public final class TagsPlugin extends JavaPlugin {
         new TagPlaceholder(this.registry).register();
 
         CompletableFuture.supplyAsync(() -> {
-            new Database().createAdapter();
+            final GazelleConfiguration configuration = new TomlGazelleConfiguration(getDataFolder() + "/hikari-settings.toml");
+            final Gazelle gazelle = new Gazelle(Thread.currentThread(), configuration);
+
+            gazelle.registerTables(
+                    new TableConfigRegistry(), new TableTagRegistry()
+            );
+
+            try {
+                gazelle.start();
+            } catch (final SQLException exception) {
+                exception.printStackTrace();
+            }
 
             registry.load(this);
             return null;
@@ -49,9 +63,11 @@ public final class TagsPlugin extends JavaPlugin {
         super.onDisable();
 
         CompletableFuture.supplyAsync(() -> {
-            Database.INSTANCE.terminateAdapter();
+            Gazelle.stop();
             return null;
         }).join();
+
+        reloadConfig();
     }
 
     public TagRegistry getRegistry() {

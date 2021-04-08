@@ -1,14 +1,14 @@
 package frosty.op65n.tech.tagsspigot.storage;
 
 import frosty.op65n.tech.tagsspigot.TagsPlugin;
-import frosty.op65n.tech.tagsspigot.database.api.ConcurrentConnection;
-import frosty.op65n.tech.tagsspigot.database.api.DataSource;
 import frosty.op65n.tech.tagsspigot.storage.impl.TagHolder;
 import frosty.op65n.tech.tagsspigot.util.PermissionUtil;
 import frosty.op65n.tech.tagsspigot.util.TaskUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.op65n.gazelle.api.ConcurrentConnection;
+import org.op65n.gazelle.api.DataSource;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,8 +23,6 @@ public final class TagRegistry {
     public Map<String, TagHolder> getTagRegistry() {
         return TAG_REGISTRY;
     }
-
-    public static Map<String, TagHolder> getTemporaryTagRegistry() { return TAG_REGISTRY; }
 
     public TagHolder getTagWithIdentifier(final String identifier) {
         return TAG_REGISTRY.get(identifier);

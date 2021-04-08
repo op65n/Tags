@@ -1,12 +1,12 @@
 package frosty.op65n.tech.tagsspigot.placeholder;
 
-import frosty.op65n.tech.tagsspigot.database.api.ConcurrentConnection;
-import frosty.op65n.tech.tagsspigot.database.api.DataSource;
 import frosty.op65n.tech.tagsspigot.storage.TagRegistry;
 import frosty.op65n.tech.tagsspigot.storage.impl.TagHolder;
 import frosty.op65n.tech.tagsspigot.util.HexUtil;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
+import org.op65n.gazelle.api.ConcurrentConnection;
+import org.op65n.gazelle.api.DataSource;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

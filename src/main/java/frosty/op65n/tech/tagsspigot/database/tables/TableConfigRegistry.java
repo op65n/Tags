@@ -1,18 +1,10 @@
 package frosty.op65n.tech.tagsspigot.database.tables;
 
-import frosty.op65n.tech.tagsspigot.database.adapter.ITable;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
+import org.op65n.gazelle.api.DatabaseTable;
 
-public final class TableConfigRegistry implements ITable {
-
-    @NotNull
-    @Language("MariaDB")
-    private String database = "tags";
-
-    public TableConfigRegistry(@Language("MariaDB") final @NotNull String database) {
-        this.database = database;
-    }
+public final class TableConfigRegistry implements DatabaseTable {
 
     @Override
     public int priority() {
@@ -21,8 +13,8 @@ public final class TableConfigRegistry implements ITable {
 
     @Override
     @Language("MariaDB")
-    public @NotNull String getCreateQuery() {
-        return "CREATE TABLE IF NOT EXISTS `" + database + "`.`config_registry` ( " +
+    public @NotNull String createQuery() {
+        return "CREATE TABLE IF NOT EXISTS `%database%`.`config_registry` ( " +
                 "  `identifier` VARCHAR(36) NOT NULL, " +
                 "  `description` VARCHAR(100) NOT NULL, " +
                 "  `display` VARCHAR(100) NOT NULL, " +
