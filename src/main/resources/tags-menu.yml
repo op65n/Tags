@@ -1,36 +1,37 @@
-menu-title: "&9| Tags &8({tag_acquired}/{tag_total})"
+menu-title: "&9| Chat Tags &8(&0{tag_acquired} &8od &0{tag_total}&8)"
 menu-size: 54
 page-size: 36
 items:
   filler:
     material: GRAY_STAINED_GLASS_PANE
     display: " "
-    slots: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 26, 27, 35, 36, 43, 44, 46, 47, 51, 52, 53]
-  close:
-    material: STRUCTURE_VOID
-    display: "&cClose Selector"
+    slots: [0, 1, 2, 3, 4, 5, 6, 7, 8, 45, 46, 47, 48, 50, 51, 52, 53]
+  unselect:
+    material: PAINTING
+    display: "&7Odstrani Tag"
+    lore:
+      - ""
+      - " &9| &fTrenutno imas izbrani tag: &8\"%tag_display-colored%&8\"&f,"
+      - " &9| &fklikni, da ga odstranis."
+      - ""
     slot: 49
-    action: CLOSE
+    action: UNSELECT_TAG
   next:
-    material: ARROW
-    display: "&aNext Page"
+    material: SPECTRAL_ARROW
+    display: "&7Naslednja Stran"
     slot: 50
     action: NEXT_PAGE
   previous:
-    material: ARROW
-    display: "&aPrevious Page"
+    material: SPECTRAL_ARROW
+    display: "&7Prejsnja Stran"
     slot: 48
     action: PREVIOUS_PAGE
-  unselect:
-    material: ANVIL
-    display: "&cUnselect Tag"
-    slot: 45
-    action: UNSELECT_TAG
 
 tag-item:
   material: NAME_TAG
-  display: "{tag_display} Tag"
+  display: "&8\"{tag_display}&8\" &7Tag"
   lore:
-    - "&7&o{tag_description}"
+    - " &9| &7{tag_description}"
     - ""
-    - " &7&oClick to select this tag."
+    - " &9| &fKlikni da izberes ta tag."
+    - ""

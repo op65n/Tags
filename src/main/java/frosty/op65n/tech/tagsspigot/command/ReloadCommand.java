@@ -21,7 +21,7 @@ public final class ReloadCommand extends CommandBase {
     @Permission("tags.command.reload")
     public void onReload(final CommandSender sender) {
         TaskUtil.async(() -> {
-            plugin.getRegistry().request();
+            plugin.getRegistry().request(0);
 
             sender.sendMessage("Gawk Gawk Requested updated config from Database.");
         });

@@ -44,7 +44,7 @@ public final class TagRegistry {
         return result;
     }
 
-    public void request() {
+    public void request(final long delay) {
         TaskUtil.async(() -> {
             try {
                 final DataSource dataSource = new ConcurrentConnection().borrow();
@@ -74,7 +74,7 @@ public final class TagRegistry {
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
-        });
+        }, delay);
     }
 
     public void load(final TagsPlugin plugin) {

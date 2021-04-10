@@ -13,6 +13,10 @@ public final class TaskUtil {
         SCHEDULER.scheduleAsyncDelayedTask(PLUGIN, runnable);
     }
 
+    public static void async(final Runnable runnable, final long delay) {
+        SCHEDULER.scheduleAsyncDelayedTask(PLUGIN, runnable, delay);
+    }
+
     public static void queue(final Runnable runnable) {
         SCHEDULER.scheduleSyncDelayedTask(PLUGIN, runnable);
     }

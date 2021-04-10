@@ -8,6 +8,7 @@ import frosty.op65n.tech.tagsspigot.listener.JoinListener;
 import frosty.op65n.tech.tagsspigot.placeholder.TagPlaceholder;
 import frosty.op65n.tech.tagsspigot.storage.TagRegistry;
 import frosty.op65n.tech.tagsspigot.util.FileUtil;
+import frosty.op65n.tech.tagsspigot.util.TaskUtil;
 import me.mattstudios.mf.base.CommandManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.op65n.gazelle.Gazelle;
@@ -39,10 +40,9 @@ public final class TagsPlugin extends JavaPlugin {
 
         new TagPlaceholder(this.registry).register();
 
-        CompletableFuture.supplyAsync(() -> {
-            final GazelleConfiguration configuration = new TomlGazelleConfiguration(getDataFolder() + "/hikari-settings.toml");
-            final Gazelle gazelle = new Gazelle(Thread.currentThread(), configuration);
-
+        final GazelleConfiguration configuration = new TomlGazelleConfiguration(getDataFolder() + "/hikari-settings.toml");
+        final Gazelle gazelle = new Gazelle(Thread.currentThread(), configuration);
+        TaskUtil.async(() -> {
             gazelle.registerTables(
                     new TableConfigRegistry(), new TableTagRegistry()
             );
@@ -54,8 +54,8 @@ public final class TagsPlugin extends JavaPlugin {
             }
 
             registry.load(this);
-            return null;
-        }).thenRun(registry::request);
+            registry.request(0);
+        });
     }
 
     @Override

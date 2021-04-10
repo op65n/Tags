@@ -63,8 +63,8 @@ public final class TagMenu {
                 final Material material = Material.matchMaterial(itemSection.getString("material"));
                 final ItemBuilder builder = ItemBuilder.from(material);
 
-                builder.setName(HexUtil.colorify(itemSection.getString("display")));
-                builder.setLore(HexUtil.colorify(itemSection.getStringList("lore")));
+                builder.setName(HexUtil.colorifyAndParse(itemSection.getString("display"), player));
+                builder.setLore(HexUtil.colorifyAndParse(itemSection.getStringList("lore"), player));
 
                 final String action = itemSection.getString("action", "NONE").toUpperCase();
                 final GuiItem item = new GuiItem(builder.build(), event -> {

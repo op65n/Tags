@@ -1,7 +1,9 @@
 package frosty.op65n.tech.tagsspigot.util;
 
+import me.clip.placeholderapi.PlaceholderAPI;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -116,8 +118,16 @@ public final class HexUtil {
         return parsed;
     }
 
+    public static String colorifyAndParse(final String message, final Player player) {
+        return PlaceholderAPI.setPlaceholders(player, colorify(message));
+    }
+
     public static List<String> colorify(final List<String> message) {
         return message.stream().map(HexUtil::colorify).collect(Collectors.toList());
+    }
+
+    public static List<String> colorifyAndParse(final List<String> message, final Player player) {
+        return message.stream().map(it -> colorifyAndParse(it, player)).collect(Collectors.toList());
     }
 
     private static String parseRainbow(final String message) {
