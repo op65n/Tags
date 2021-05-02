@@ -12,8 +12,8 @@ import frosty.op65n.tech.tagsspigot.util.TaskUtil;
 import me.mattstudios.mf.base.CommandManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.op65n.gazelle.Gazelle;
-import org.op65n.gazelle.adapter.TomlGazelleConfiguration;
-import org.op65n.gazelle.api.GazelleConfiguration;
+import org.op65n.gazelle.configuration.GazelleConfiguration;
+import org.op65n.gazelle.configuration.impl.TomlGazelleConfiguration;
 
 import java.sql.SQLException;
 import java.util.concurrent.CompletableFuture;

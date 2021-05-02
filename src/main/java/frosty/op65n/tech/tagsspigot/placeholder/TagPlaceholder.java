@@ -5,8 +5,9 @@ import frosty.op65n.tech.tagsspigot.storage.impl.TagHolder;
 import frosty.op65n.tech.tagsspigot.util.HexUtil;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
-import org.op65n.gazelle.api.ConcurrentConnection;
-import org.op65n.gazelle.api.DataSource;
+import org.jetbrains.annotations.NotNull;
+import org.op65n.gazelle.api.connection.ConcurrentConnection;
+import org.op65n.gazelle.api.holder.DataSource;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,17 +44,17 @@ public final class TagPlaceholder extends PlaceholderExpansion {
     }
 
     @Override
-    public String getVersion() {
-        return "1.0.0-Alpha";
+    public @NotNull String getVersion() {
+        return "@version@";
     }
 
     @Override
-    public String getAuthor() {
+    public @NotNull String getAuthor() {
         return "Frcsty";
     }
 
     @Override
-    public String getIdentifier() {
+    public @NotNull String getIdentifier() {
         return "tag";
     }
 

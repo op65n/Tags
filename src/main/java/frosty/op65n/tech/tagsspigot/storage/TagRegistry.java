@@ -7,8 +7,8 @@ import frosty.op65n.tech.tagsspigot.util.TaskUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.op65n.gazelle.api.ConcurrentConnection;
-import org.op65n.gazelle.api.DataSource;
+import org.op65n.gazelle.api.connection.ConcurrentConnection;
+import org.op65n.gazelle.api.holder.DataSource;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,6 +43,7 @@ public final class TagRegistry {
 
         return result;
     }
+
 
     public void request(final long delay) {
         TaskUtil.async(() -> {

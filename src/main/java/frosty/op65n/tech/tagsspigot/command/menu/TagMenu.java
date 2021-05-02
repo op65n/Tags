@@ -14,11 +14,12 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.op65n.gazelle.api.ConcurrentConnection;
-import org.op65n.gazelle.api.DataSource;
+import org.op65n.gazelle.api.connection.ConcurrentConnection;
+import org.op65n.gazelle.api.holder.DataSource;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Map;
 
 @SuppressWarnings("ConstantConditions")
@@ -74,33 +75,15 @@ public final class TagMenu {
                         case "NEXT_PAGE" -> gui.next();
                         case "PREVIOUS_PAGE" -> gui.previous();
                         case "CLOSE" -> gui.close(viewer);
-                        case "UNSELECT_TAG" -> {
-                            TaskUtil.async(() -> {
-                                try {
-                                    final DataSource dataSource = new ConcurrentConnection().borrow();
-                                    final PreparedStatement updateQuery = dataSource.prepare(
-                                            "REPLACE INTO tag_registry (player, tag) VALUES (?, ?);"
-                                    );
-
-                                    updateQuery.setString(1, player.getName());
-                                    updateQuery.setString(2, "");
-                                    updateQuery.executeQuery();
-
-                                    dataSource.free();
-                                    TagPlaceholder.cachePlayerTag(player);
-                                    gui.close(player);
-                                } catch (SQLException ex) {
-                                    ex.printStackTrace();
-                                }
-                            });
-                        }
+                        case "UNSELECT_TAG" -> TaskUtil.async(() -> {
+                            update(player, "");
+                            gui.close(player);
+                        });
                     }
                 });
 
-                if (itemSection.get("slot") != null)
-                    gui.setItem(itemSection.getInt("slot"), item);
-                else
-                    gui.setItem(itemSection.getIntegerList("slots"), item);
+                if (itemSection.get("slot") != null) gui.setItem(itemSection.getInt("slot"), item);
+                else gui.setItem(itemSection.getIntegerList("slots"), item);
             }
         }
 
@@ -118,32 +101,22 @@ public final class TagMenu {
                     "{tag_description}", holder.getDescription(),
                     "{tag_permission}", holder.getPermission()
             )));
-            builder.setLore(HexUtil.colorify(ReplaceUtil.replaceList(
-                    tagSection.getStringList("lore"),
-                    "{tag_identifier}", key,
-                    "{tag_display}", holder.getDisplay(),
-                    "{tag_description}", holder.getDescription(),
-                    "{tag_permission}", holder.getPermission()
-            )));
+
+            final StringBuilder loreBuilder = new StringBuilder();
+            for (final String line : tagSection.getStringList("lore")) {
+                loreBuilder.append(ReplaceUtil.replaceString(
+                        line,
+                        "{tag_identifier}", key,
+                        "{tag_display}", holder.getDisplay(),
+                        "{tag_description}", holder.getDescription(),
+                        "{tag_permission}", holder.getPermission()
+                )).append("\n");
+            }
+
+            builder.setLore(HexUtil.colorify(Arrays.asList(loreBuilder.toString().split("\n"))));
 
             final GuiItem item = new GuiItem(builder.build(), event -> {
-                TaskUtil.async(() -> {
-                    try {
-                        final DataSource dataSource = new ConcurrentConnection().borrow();
-                        final PreparedStatement updateQuery = dataSource.prepare(
-                                "REPLACE INTO tag_registry (player, tag) VALUES (?, ?);"
-                        );
-                        updateQuery.setString(1, player.getName());
-                        updateQuery.setString(2, holder.getIdentifier());
-                        updateQuery.executeQuery();
-
-                        dataSource.free();
-
-                        TagPlaceholder.cachePlayerTag(player);
-                    } catch (SQLException ex) {
-                        ex.printStackTrace();
-                    }
-                });
+                TaskUtil.async(() -> update(player, holder.getIdentifier()));
                 gui.close(player);
             });
 
@@ -151,6 +124,24 @@ public final class TagMenu {
         }
 
         return gui;
+    }
+
+    private void update(final Player player, final String tag) {
+        try {
+            final DataSource dataSource = new ConcurrentConnection().borrow();
+            final PreparedStatement updateQuery = dataSource.prepare(
+                    "REPLACE INTO tag_registry (player, tag) VALUES (?, ?);"
+            );
+
+            updateQuery.setString(1, player.getName());
+            updateQuery.setString(2, tag);
+            updateQuery.executeQuery();
+
+            dataSource.free();
+            TagPlaceholder.cachePlayerTag(player);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
     }
 
     public PaginatedGui getMenu() {
