@@ -1,5 +1,8 @@
 package frosty.op65n.tech.tagsspigot.command.menu;
 
+import dev.triumphteam.gui.builder.item.ItemBuilder;
+import dev.triumphteam.gui.guis.GuiItem;
+import dev.triumphteam.gui.guis.PaginatedGui;
 import frosty.op65n.tech.tagsspigot.placeholder.TagPlaceholder;
 import frosty.op65n.tech.tagsspigot.storage.TagRegistry;
 import frosty.op65n.tech.tagsspigot.storage.impl.TagHolder;
@@ -7,9 +10,6 @@ import frosty.op65n.tech.tagsspigot.util.FileUtil;
 import frosty.op65n.tech.tagsspigot.util.HexUtil;
 import frosty.op65n.tech.tagsspigot.util.ReplaceUtil;
 import frosty.op65n.tech.tagsspigot.util.TaskUtil;
-import me.mattstudios.mfgui.gui.components.ItemBuilder;
-import me.mattstudios.mfgui.gui.guis.GuiItem;
-import me.mattstudios.mfgui.gui.guis.PaginatedGui;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
