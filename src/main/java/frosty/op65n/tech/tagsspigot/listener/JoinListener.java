@@ -8,14 +8,14 @@ import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.sql.SQLException;
 
-public class JoinListener implements Listener {
+public final class JoinListener implements Listener {
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
         TaskUtil.async(() -> {
             try {
                 TagPlaceholder.cachePlayerTag(event.getPlayer());
-            } catch (SQLException ex) {
+            } catch (final SQLException ex) {
                 ex.printStackTrace();
             }
         });
