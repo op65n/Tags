@@ -4,7 +4,7 @@ import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 import org.op65n.gazelle.api.DatabaseTable;
 
-public class TableTagRegistry implements DatabaseTable {
+public final class TableTagRegistry implements DatabaseTable {
 
     @Override
     public int priority() {
