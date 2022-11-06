@@ -1,121 +1,63 @@
 package frosty.op65n.tech.tagsspigot.storage;
 
-import frosty.op65n.tech.tagsspigot.TagsPlugin;
-import frosty.op65n.tech.tagsspigot.storage.impl.TagHolder;
-import frosty.op65n.tech.tagsspigot.util.PermissionUtil;
-import frosty.op65n.tech.tagsspigot.util.TaskUtil;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import frosty.op65n.tech.tagsspigot.struct.TagHolder;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.cacheddata.CachedMetaData;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.node.NodeType;
+import net.luckperms.api.node.types.MetaNode;
+import net.luckperms.api.node.types.PermissionNode;
 import org.bukkit.entity.Player;
-import org.op65n.gazelle.api.connection.ConcurrentConnection;
-import org.op65n.gazelle.api.holder.DataSource;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public final class TagRegistry {
 
-    private static final Map<String, TagHolder> TAG_REGISTRY = new HashMap<>();
+    private static final Cache<UUID, TagHolder> ACTIVE_DATA = CacheBuilder.newBuilder().build();
+    private static final LuckPerms LUCK_PERMS = LuckPermsProvider.get();
 
-    public Map<String, TagHolder> getTagRegistry() {
-        return TAG_REGISTRY;
+    public static Set<TagHolder> requestTagsForUser(final Player player) {
+        final LuckPerms luckPerms = LuckPermsProvider.get();
+        final User user = luckPerms.getUserManager().getUser(player.getUniqueId());
+        if (user == null)
+            throw new RuntimeException("Retrieved invalid User from LuckPerms (Not Loaded)");
+
+        final Set<PermissionNode> tagPermissions = user.getNodes(NodeType.PERMISSION).stream()
+                .filter(it -> it.getPermission().startsWith("tag"))
+                .collect(Collectors.toSet());
+
+        return tagPermissions.stream().map(it -> TagHolder.fromPermission(it.getPermission())).collect(Collectors.toSet());
     }
 
-    public TagHolder getTagWithIdentifier(final String identifier) {
-        return TAG_REGISTRY.get(identifier);
-    }
-
-    public Map<String, TagHolder> getTagsForUser(final Player player) {
-        final Map<String, TagHolder> result = new HashMap<>();
-
-        for (final String key : TAG_REGISTRY.keySet()) {
-            final TagHolder holder = TAG_REGISTRY.get(key);
-
-            if (!PermissionUtil.hasPermission(player, holder.getPermission())) {
-                continue;
-            }
-
-            result.put(key, holder);
+    public static TagHolder requestActiveTagForUser(final Player player) {
+        final TagHolder active = ACTIVE_DATA.getIfPresent(player.getUniqueId());
+        if (active != null) {
+            return active;
         }
 
-        return result;
+        final CachedMetaData data = LUCK_PERMS.getPlayerAdapter(Player.class).getMetaData(player);
+        final TagHolder created = TagHolder.fromPermission(data.getMetaValue("active_tag", String::valueOf).orElse("empty"));
+        ACTIVE_DATA.put(player.getUniqueId(), created);
+
+        return created;
     }
 
+    public static void setActiveTagForUser(final Player player, final TagHolder holder) {
+        final LuckPerms luckPerms = LuckPermsProvider.get();
+        final User user = luckPerms.getPlayerAdapter(Player.class).getUser(player);
 
-    public void request(final long delay) {
-        TaskUtil.async(() -> {
-            try {
-                final DataSource dataSource = new ConcurrentConnection().borrow();
-                final PreparedStatement updateQuery = dataSource.prepare(
-                        "SELECT identifier, description, display, permission FROM config_registry;"
-                );
+        final MetaNode node = MetaNode.builder("active_tag", holder.permission()).build();
 
-                final ResultSet result = updateQuery.executeQuery();
+        user.data().clear(NodeType.META.predicate(it -> it.getMetaKey().equals("active_tag")));
+        user.data().add(node);
 
-                dataSource.borrow(result.getFetchSize());
-                while (result.next()) {
-                    final String identifier = result.getString("identifier");
-
-                    TAG_REGISTRY.put(
-                            identifier,
-                            new TagHolder(
-                                    identifier,
-                                    result.getString("description"),
-                                    result.getString("display"),
-                                    result.getString("permission")
-                            )
-                    );
-                }
-
-                updateQuery.close();
-                dataSource.free();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }, delay);
-    }
-
-    public void load(final TagsPlugin plugin) {
-        final FileConfiguration configuration = plugin.getConfig();
-
-        if (!configuration.getBoolean("main-file-registry")) {
-            return;
-        }
-
-        final ConfigurationSection section = configuration.getConfigurationSection("tags");
-        if (section == null) {
-            return;
-        }
-
-        TaskUtil.async(() ->
-                section.getKeys(false).forEach(it -> {
-                    try {
-                        final ConfigurationSection tagSection = section.getConfigurationSection(it);
-                        if (tagSection == null) {
-                            return;
-                        }
-
-                        final DataSource dataSource = new ConcurrentConnection().borrow();
-                        final PreparedStatement updateQuery = dataSource.prepare(
-                                "REPLACE INTO config_registry (identifier, description, display, permission) VALUES (?, ?, ?, ?);"
-                        );
-
-                        updateQuery.setString(1, it);
-                        updateQuery.setString(2, tagSection.getString("description"));
-                        updateQuery.setString(3, tagSection.getString("display"));
-                        updateQuery.setString(4, tagSection.getString("permission"));
-                        updateQuery.executeQuery();
-
-                        updateQuery.close();
-                        dataSource.free();
-                    } catch (final SQLException ex) {
-                        ex.printStackTrace();
-                    }
-                })
-        );
+        luckPerms.getUserManager().saveUser(user);
+        ACTIVE_DATA.invalidate(player.getUniqueId());
     }
 
 }

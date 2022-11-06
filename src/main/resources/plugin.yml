@@ -1,5 +1,0 @@
-name: TagsSpigot
-version: @version@
-main: frosty.op65n.tech.tagsspigot.TagsPlugin
-api-version: 1.16
-author: Frcsty
